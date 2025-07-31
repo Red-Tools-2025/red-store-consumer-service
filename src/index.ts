@@ -1,1 +1,1 @@
-console.log("Hello Testing true");
+// Main script file for running workers
