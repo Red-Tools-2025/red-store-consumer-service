@@ -3,6 +3,8 @@ import { InventoryMessage } from "../types/events";
 import { SalesMessage } from "../types/events";
 import { redis } from "../lib/redis-cache-client";
 
+import { SalesEventQueue } from "../lib/bullmq-client";
+
 // Script to run workers for cache + db updates
 export const mQService = async (consumerRegistery: Set<Consumer>) => {
   try {
@@ -35,8 +37,8 @@ export const mQService = async (consumerRegistery: Set<Consumer>) => {
             const parsed = JSON.parse(
               message.value?.toString() || "{}"
             ) as SalesMessage;
-
             console.log({ sale_event_records: parsed.sales_records });
+            await SalesEventQueue.add("sales-worker", parsed);
           } else {
             console.log(
               `Unknown topic type discovered - ${topic_type}, unsure on how to furter proceed 😶`
