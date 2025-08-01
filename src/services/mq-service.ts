@@ -1,4 +1,5 @@
 import { Consumer } from "kafkajs";
+import { InventoryMessage } from "../types/events";
 
 // Script to run workers for cache + db updates
 export const mqService = async (consumerRegistery: Set<Consumer>) => {
@@ -12,11 +13,25 @@ export const mqService = async (consumerRegistery: Set<Consumer>) => {
             `📩 ${topic} - ${message.value?.toString()} [${partition}]`
           );
 
+          if (message.value) {
+            const parsed = JSON.parse(
+              message.value?.toString() || "{}"
+            ) as InventoryMessage;
+
+            parsed.inv_update.forEach((item) => {
+              console.log(
+                `Product ID: ${item.p_id}, Quantity: ${item.quantity}`
+              );
+            });
+          }
+
           // Split on topic basis
           const [topic_type, userId] = topic.split("_");
           if (topic_type === "inventory-updates-event") {
             // Publish Event to redis channel for + Update Redis cache products to keep cache active (cheaper than pull)
+            console.log("INV TYPE");
           } else if (topic_type === "sales-event") {
+            console.log("SALES TYPE");
             // MQ Queuing action for sales worker process (Updated Timeseries DB + Inventory DB)
           } else {
             console.log(
