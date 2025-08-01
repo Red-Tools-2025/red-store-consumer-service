@@ -19,6 +19,7 @@
   "dependencies": {
     "bullmq": "^5.56.8",
     "dotenv": "^17.2.1",
+    "ioredis": "^5.7.0",
     "kafkajs": "^2.2.4"
   }
 }
