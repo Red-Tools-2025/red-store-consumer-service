@@ -24,8 +24,11 @@ export const discoveryService = async (
       }
     }
 
-    // Finding topics that are running on Kafka but not registered
-    const unregisteredTopics = topics.filter((t) => !registered_topics.has(t));
+    // Finding topics that are running on Kafka but not registered (Avoiding system topics)
+    const isSystemTopic = (topic: string) => topic.startsWith("__");
+    const unregisteredTopics = topics.filter(
+      (t) => !registered_topics.has(t) && !isSystemTopic(t)
+    );
 
     if (unregisteredTopics.length > 0) {
       console.log("Unregistered topics detected ⚠️ ", unregisteredTopics);
@@ -42,14 +45,6 @@ export const discoveryService = async (
       console.log("Creating new consumer subscription to topics 💯");
       await consumer.connect();
       await consumer.subscribe({ topics: unregisteredTopics });
-
-      // Start processing messages
-      await consumer.run({
-        eachMessage: async ({ topic, partition, message }) => {
-          console.log(`📥 [${topic}] Message: ${message.value?.toString()}`);
-          // Logic to be added here later
-        },
-      });
 
       // Add new topics to registry
       if (!topicRegistery["default"]) topicRegistery["default"] = new Set();
