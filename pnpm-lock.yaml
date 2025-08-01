@@ -8,6 +8,12 @@ dependencies:
   bullmq:
     specifier: ^5.56.8
     version: 5.56.8
+  dotenv:
+    specifier: ^17.2.1
+    version: 17.2.1
+  kafkajs:
+    specifier: ^2.2.4
+    version: 2.2.4
 
 devDependencies:
   '@types/node':
@@ -195,6 +201,11 @@ packages:
     engines: {node: '>=0.3.1'}
     dev: true
 
+  /dotenv@17.2.1:
+    resolution: {integrity: sha512-kQhDYKZecqnM0fCnzI5eIv5L4cAe/iRI+HqMbO/hbRdTAeXDG+M9FjipUxNfbARuEg4iHIbhnhs78BCHNbSxEQ==}
+    engines: {node: '>=12'}
+    dev: false
+
   /ioredis@5.6.1:
     resolution: {integrity: sha512-UxC0Yv1Y4WRJiGQxQkP0hfdL0/5/6YvdfOOClRgJ0qppSarkhneSa6UvkMkms0AkdGimSH3Ikqm+6mkMmX7vGA==}
     engines: {node: '>=12.22.0'}
@@ -210,6 +221,11 @@ packages:
       standard-as-callback: 2.1.0
     transitivePeerDependencies:
       - supports-color
+    dev: false
+
+  /kafkajs@2.2.4:
+    resolution: {integrity: sha512-j/YeapB1vfPT2iOIUn/vxdyKEuhuY2PxMBvf5JWux6iSaukAccrMtXEY/Lb7OvavDhOWME589bpLrEdnVHjfjA==}
+    engines: {node: '>=14.0.0'}
     dev: false
 
   /lodash.defaults@4.2.0:
