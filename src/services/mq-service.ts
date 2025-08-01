@@ -8,7 +8,9 @@ export const mqService = async (consumerRegistery: Set<Consumer>) => {
       await consumer.connect();
       await consumer.run({
         eachMessage: async ({ topic, partition, message }) => {
-          console.log(`📩 ${topic} - ${message} [${partition}]`);
+          console.log(
+            `📩 ${topic} - ${message.value?.toString()} [${partition}]`
+          );
         },
       });
     }
