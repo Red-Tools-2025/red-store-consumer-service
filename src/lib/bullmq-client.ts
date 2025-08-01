@@ -10,7 +10,7 @@ const connection = new IORedis({
   port: 6380,
 });
 
-// Defining Queues for processing right events
+// Defining Queues for queueing produced events
 export const SalesEventQueue = new Queue("SalesEventQueue", { connection });
 export const InventoryEventQueue = new Queue("InventoryEventQueue", {
   connection,
