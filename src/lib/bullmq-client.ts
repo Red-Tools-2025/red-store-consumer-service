@@ -8,6 +8,7 @@ import { inventoryEventJob } from "../jobs/inventory-event-job";
 const connection = new IORedis({
   host: "localhost",
   port: 6380,
+  maxRetriesPerRequest: null,
 });
 
 // Defining Queues for queueing produced events
