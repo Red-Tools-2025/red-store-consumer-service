@@ -1,9 +1,10 @@
 import { Consumer } from "kafkajs";
 import { InventoryMessage } from "../types/events";
+import { SalesMessage } from "../types/events";
 import { redis } from "../lib/redis-cache-client";
 
 // Script to run workers for cache + db updates
-export const mqService = async (consumerRegistery: Set<Consumer>) => {
+export const mQService = async (consumerRegistery: Set<Consumer>) => {
   try {
     // Running Each consumer from registery & Mapping Jobs to relevant topic messages
     for (const consumer of consumerRegistery) {
@@ -28,11 +29,14 @@ export const mqService = async (consumerRegistery: Set<Consumer>) => {
             console.log(`⚙️ Publishing updates to ${channel_name}`);
 
             await redis.publish(channel_name, JSON.stringify(parsed));
-
-            console.log("INV TYPE");
           } else if (topic_type === "sales-event") {
-            console.log("SALES TYPE");
             // MQ Queuing action for sales worker process (Updated Timeseries DB + Inventory DB)
+            if (!message.value) console.log("Incoming Event Message corrupted");
+            const parsed = JSON.parse(
+              message.value?.toString() || "{}"
+            ) as SalesMessage;
+
+            console.log({ sale_event_records: parsed.sales_records });
           } else {
             console.log(
               `Unknown topic type discovered - ${topic_type}, unsure on how to furter proceed 😶`
