@@ -3,6 +3,7 @@ import { Queue, Worker } from "bullmq";
 
 // Jobs
 import { salesEventJob } from "../jobs/sales-event-job";
+import { inventoryEventJob } from "../jobs/inventory-event-job";
 
 const connection = new IORedis({
   host: "localhost",
@@ -19,3 +20,8 @@ export const InventoryEventQueue = new Queue("InventoryEventQueue", {
 export const SalesEventWorker = new Worker("SalesEventWorker", salesEventJob, {
   connection,
 });
+export const InventoryEventWorker = new Worker(
+  "InventoryEventWorker",
+  inventoryEventJob,
+  { connection }
+);
