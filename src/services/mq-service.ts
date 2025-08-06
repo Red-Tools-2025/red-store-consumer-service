@@ -33,15 +33,21 @@ export const mQService = async (consumerRegistery: Set<Consumer>) => {
 
             const cache_fetch_pipeline = redis.pipeline();
             const cache_update_pipeline = redis.pipeline();
-            const cache_keys: string[] = [];
+
+            const cache_keys: string[] = []; // For tracking which key fails on retrieval for corrupted or missing cache
+            const cache_products: CachedInventoryProduct[] = []; // For Update
+
+            const updateMap = new Map<number, number>(); // For faster update lookups
 
             // Perform Cache update + Pubishing to relevant channels [safety: Update cache, --> then : Publish changes]
-            // Retrieve product
 
             parsed.inv_update.forEach((update_event) => {
               const product_cache_key = `inv_products:${parsed.store_id}:${update_event.p_id}`;
               cache_keys.push(product_cache_key);
               cache_fetch_pipeline.get(product_cache_key);
+
+              // Build Map
+              updateMap.set(update_event.p_id, update_event.quantity);
             });
 
             console.log(
@@ -59,10 +65,35 @@ export const mQService = async (consumerRegistery: Set<Consumer>) => {
                 typeof result === "string" && result
                   ? (JSON.parse(result) as CachedInventoryProduct)
                   : ({} as CachedInventoryProduct);
-              // Observation
-              console.log({ parsed_product });
+
+              cache_products.push(parsed_product);
             });
 
+            // Initiate update pipeline for product
+            const updated_cache_products = cache_products.map((product) => {
+              const delta = updateMap.get(product.invId);
+              if (delta !== undefined) {
+                return {
+                  ...product,
+                  invItemStock: product.invItemStock + delta,
+                };
+              }
+              return product; // no update needed
+            });
+
+            // Buid & Execute update pipeline
+            updated_cache_products.forEach((product) => {
+              const product_cache_key = `inv_products:${parsed.store_id}:${product.invId}`;
+              const new_cache_payload = JSON.stringify(product);
+              cache_update_pipeline.set(product_cache_key, new_cache_payload);
+            });
+
+            console.log(
+              `🪈 Commencing Update Pipeline for Store[User] : ${parsed.store_id}[${parsed.user_id}]`
+            );
+            await cache_update_pipeline.exec();
+
+            console.log(`📺 Publishing updateds to Channel : ${channel_name}`);
             await redis.publish(channel_name, JSON.stringify(parsed));
           } else if (topic_type === "sales-event") {
             // MQ Queuing action for sales worker process (Updated Timeseries DB + Inventory DB)
@@ -74,7 +105,7 @@ export const mQService = async (consumerRegistery: Set<Consumer>) => {
             await SalesEventQueue.add("sales-worker", parsed);
           } else {
             console.log(
-              `Unknown topic type discovered - ${topic_type}, unsure on how to furter proceed 😶`
+              `Unknown topic type discovered - ${topic_type}, cant proceed bruhh 😶`
             );
           }
         },
