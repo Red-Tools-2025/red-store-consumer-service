@@ -11,3 +11,11 @@ SalesEventWorker.on("completed", (job) => {
 SalesEventWorker.on("failed", (job, err) => {
   console.error(`Job ${job?.id} failed with error:`, err);
 });
+
+console.log("Sales Event Worker started and listening for jobs...");
+
+process.on("SIGINT", async () => {
+  console.log("Shutting down worker...");
+  await SalesEventWorker.close();
+  process.exit(0);
+});

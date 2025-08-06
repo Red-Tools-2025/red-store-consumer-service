@@ -39,6 +39,11 @@ export const mQService = async (consumerRegistery: Set<Consumer>) => {
               `sales_update_job-${parsed.store_id}-${parsed.user_id}`,
               parsed
             );
+            console.log(
+              `📋 Job queued: sales_update_job-${parsed.store_id}-${userId}`
+            );
+            const waiting = await SalesEventQueue.getWaiting();
+            console.log(`Jobs waiting: ${waiting.length}`);
           } else {
             console.log(
               `Unknown topic type discovered - ${topic_type}, cant proceed bruhh 😶`
