@@ -31,6 +31,10 @@ export const mQService = async (consumerRegistery: Set<Consumer>) => {
             console.log(`⚙️ Publishing updates to ${channel_name}`);
 
             await redis.publish(channel_name, JSON.stringify(parsed));
+
+            // Perform Cache update
+
+            // Return product from cache
           } else if (topic_type === "sales-event") {
             // MQ Queuing action for sales worker process (Updated Timeseries DB + Inventory DB)
             if (!message.value) console.log("Incoming Event Message corrupted");
