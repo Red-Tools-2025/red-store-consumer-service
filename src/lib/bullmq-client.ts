@@ -12,7 +12,7 @@ const connection = new IORedis({
 });
 
 // Defining Queues for queueing produced events
-export const SalesEventQueue = new Queue("sales-queue", { connection });
+export const SalesEventQueue = new Queue("sales-worker", { connection });
 export const InventoryEventQueue = new Queue("InventoryEventQueue", {
   connection,
 });

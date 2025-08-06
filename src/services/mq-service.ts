@@ -35,7 +35,10 @@ export const mQService = async (consumerRegistery: Set<Consumer>) => {
               message.value?.toString() || "{}"
             ) as SalesMessage;
             console.log({ sale_event_records: parsed.sales_records });
-            await SalesEventQueue.add("sales-worker", parsed);
+            await SalesEventQueue.add(
+              `sales_update_job-${parsed.store_id}-${parsed.user_id}`,
+              parsed
+            );
           } else {
             console.log(
               `Unknown topic type discovered - ${topic_type}, cant proceed bruhh 😶`
