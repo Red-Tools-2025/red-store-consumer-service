@@ -1,4 +1,4 @@
-# red-store-consumer-service
+# Red Store Consumer Service
 Consumer Service for ingesting all event messages across systems and updating caches and db. Processes Kafka messages and handles database operations.
 
 Key Components:
